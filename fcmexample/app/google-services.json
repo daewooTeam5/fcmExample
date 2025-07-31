@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "670116290732",
+    "project_id": "fcmexample-cdf89",
+    "storage_bucket": "fcmexample-cdf89.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670116290732:android:a56e6cc5f6477d8defff09",
+        "android_client_info": {
+          "package_name": "ngod.project.fcmexample"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpLWiXItefrhffSsbrYODYKDBNH0Oor0g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
