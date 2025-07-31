@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "fcmexample-cdf89"
+  },
+  "targets": {},
+  "etags": {
+    "fcmexample-cdf89": {
+      "extensionInstances": {}
+    }
+  },
+  "dataconnectEmulatorConfig": {}
+}
