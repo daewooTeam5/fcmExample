@@ -34,7 +34,7 @@ function getAccessToken() {
 }
 
 exports.sendFcm = functions.https.onRequest(async (req, res) => {
-    const { topic, message } = req.body;
+    const { topic, message, link } = req.body;
 
     if (!topic || !message) {
         res.status(400).send('Missing "topic" or "message" in request body.');
@@ -52,6 +52,14 @@ exports.sendFcm = functions.https.onRequest(async (req, res) => {
                 },
             },
         };
+
+        if (link) {
+            messageData.message.webpush = {
+                fcm_options: {
+                    link: link
+                }
+            };
+        }
 
         const options = {
             hostname: HOST,
@@ -87,7 +95,7 @@ exports.sendFcm = functions.https.onRequest(async (req, res) => {
 });
 
 exports.sendFcmToToken = functions.https.onRequest(async (req, res) => {
-    const { token, message } = req.body;
+    const { token, message, link } = req.body;
 
     if (!token || !message) {
         res.status(400).send('Missing "token" or "message" in request body.');
@@ -105,6 +113,14 @@ exports.sendFcmToToken = functions.https.onRequest(async (req, res) => {
                 },
             },
         };
+
+        if (link) {
+            messageData.message.webpush = {
+                fcm_options: {
+                    link: link
+                }
+            };
+        }
 
         const options = {
             hostname: HOST,
@@ -136,5 +152,46 @@ exports.sendFcmToToken = functions.https.onRequest(async (req, res) => {
     } catch (error) {
         console.error('Error sending FCM message:', error);
         res.status(500).send('Error sending FCM message.');
+    }
+});
+
+exports.subscribeUsersToTopic = functions.https.onRequest(async (req, res) => {
+    const { topic } = req.body;
+
+    if (!topic) {
+        res.status(400).send('Missing "topic" in request body.');
+        return;
+    }
+
+    try {
+        const db = admin.database();
+        const ref = db.ref('web/users');
+        const snapshot = await ref.once('value');
+        
+        if (!snapshot.exists()) {
+            res.status(404).send('No users found to subscribe.');
+            return;
+        }
+
+        const tokens = [];
+        snapshot.forEach((childSnapshot) => {
+            const token = childSnapshot.val();
+            if (token) {
+                tokens.push(token);
+            }
+        });
+
+        if (tokens.length === 0) {
+            res.status(404).send('No tokens found to subscribe.');
+            return;
+        }
+
+        let response = await admin.messaging().subscribeToTopic(tokens, topic);
+        response = {...response}
+        console.log('Successfully subscribed to topic:', response);
+        res.status(200).send(response);
+    } catch (error) {
+        console.error('Error subscribing to topic:', error);
+        res.status(500).send('Error subscribing to topic.');
     }
 });
